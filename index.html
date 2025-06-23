@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Sand Art Frame Simulator - Interactive Virtual Art</title>
+    <meta name="description" content="Experience a relaxing, interactive sand art frame simulator. Create beautiful, calming landscapes with virtual sand and bubbles. Flip, shake, and paint your own unique art.">
+    <meta name="keywords" content="sand art, sand art frame, interactive art, virtual sand, relaxation, stress relief, generative art, physics simulator, Chris Pirillo, arcade">
+    <meta name="author" content="Chris Pirillo">
+
+    <!-- SEO & Performance -->
+    <link rel="canonical" href="https://pirillo.com/arcade/sand-art.html">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://www.googletagmanager.com">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap" as="style">
+    <link rel="preload" href="https://cdn.tailwindcss.com" as="script">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap" media="print" onload="this.media='all'">
+    <noscript>
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap">
+    </noscript>
+
+    <!-- Social Media Sharing -->
+    <meta property="og:title" content="Sand Art Frame Simulator">
+    <meta property="og:description" content="Experience a relaxing, interactive sand art frame simulator. Create beautiful, calming landscapes with virtual sand and bubbles.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://pirillo.com/arcade/sand-art.html">
+    <meta property="og:image" content="https://pirillo.com/arcade/images/sand-art.png">
+    <meta property="og:image:width" content="523">
+    <meta property="og:image:height" content="359">
+    <meta property="og:site_name" content="Pirillo.com Arcade">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@ChrisPirillo">
+    <meta name="twitter:creator" content="@ChrisPirillo">
+    <meta name="twitter:title" content="Sand Art Frame Simulator">
+    <meta name="twitter:description" content="Relax and create with this interactive virtual sand art frame.">
+    <meta name="twitter:image" content="https://pirillo.com/arcade/images/sand-art.png">
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "Sand Art Frame Simulator",
+      "description": "Experience a relaxing, interactive sand art frame simulator. Create beautiful, calming landscapes with virtual sand and bubbles. Flip, shake, and paint your own unique art.",
+      "url": "https://pirillo.com/arcade/sand-art.html",
+      "author": {
+        "@type": "Person",
+        "name": "Chris Pirillo",
+        "url": "https://chris.pirillo.com/"
+      },
+      "mainEntity": {
+        "@type": "SoftwareApplication",
+        "name": "Sand Art Frame Simulator",
+        "applicationCategory": "Game",
+        "operatingSystem": "WEB",
+        "browserRequirements": "Requires a modern browser with JavaScript enabled.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0"
+        }
+      }
+    }
+    </script>
+    
+    <!-- Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1CQ4D3VQ3L"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-1CQ4D3VQ3L');
+    </script>
+
+    <!-- Utility CSS -->
+    <script src="https://cdn.tailwindcss.com" defer></script>
+    
+    <!-- Critical CSS -->
+    <style>
+        html {
+            height: 100%;
+            overflow: hidden;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            touch-action: none;
+            height: 100%;
+            position: fixed; /* Prevents scroll bounce from affecting layout */
+            width: 100%;
+        }
+        * {
+            user-select: none;
+            -webkit-user-select: none;
+            -ms-user-select: none;
+            -moz-user-select: none;
+        }
+        #simulation-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        canvas {
+            display: block;
+            box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.2), 0 10px 15px -5px rgba(0, 0, 0, 0.1);
+            border-radius: 1rem;
+            transition: transform 0.7s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            cursor: crosshair;
+        }
+        #controls {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            width: 220px;
+            background-color: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 1.5rem 1.25rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem; 
+            transition: opacity 0.4s ease-in-out;
+            z-index: 10;
+        }
+        .actions-container {
+            display: flex;
+            gap: 0.75rem;
+            width: 100%;
+        }
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            width: 100%;
+        }
+        label {
+            font-size: 1rem; 
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        input[type="range"] {
+            width: 100%; 
+            height: 5px;
+            -webkit-appearance: none;
+            appearance: none;
+            background-color: rgba(0,0,0,0.1);
+            border-radius: 5px;
+            outline: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px; 
+            height: 18px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid white;
+        }
+         input[type="range"]::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid white;
+        }
+        #paint-controls {
+            display: flex;
+            justify-content: center;
+            gap: 0.6rem;
+            padding: 0.25rem; 
+            background-color: transparent; 
+            border-radius: 0.5rem;
+            width: 100%;
+            flex-wrap: nowrap;
+        }
+        .color-swatch {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+            flex-shrink: 0; 
+        }
+        .color-swatch.selected {
+            border-color: #fff;
+            transform: scale(1.15);
+            box-shadow: 0 0 0 3px var(--main-hue-color); 
+        }
+        .button {
+            color: white;
+            padding: 0.5rem 0;
+            border-radius: 0.5rem;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 1rem;
+            width: 100%;
+            transition: all 0.2s;
+        }
+        .button:hover {
+            filter: brightness(1.1);
+        }
+        #mobile-settings-toggle {
+            display: none;
+        }
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+        
+        /* Responsive styles for mobile devices */
+        @media (max-width: 767px) {
+            canvas {
+                border-width: 0;
+                border-radius: 0;
+                box-shadow: none;
+            }
+            #controls {
+                top: auto;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                width: 100%;
+                box-sizing: border-box;
+                transform: translateY(calc(100% + 5px)); /* Hide panel completely */
+                transition: transform 0.3s ease-in-out;
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 0.5rem 1rem;
+                padding: 1rem;
+                padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+                border-radius: 0;
+                box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            }
+            #controls.is-open {
+                transform: translateY(0);
+            }
+            #mobile-settings-toggle {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                position: fixed;
+                bottom: calc(1rem + env(safe-area-inset-bottom));
+                right: 1rem;
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                border: none;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                cursor: pointer;
+                z-index: 20;
+                opacity: 0.35;
+                transition: opacity 0.2s ease-in-out;
+            }
+            #mobile-settings-toggle:hover, #mobile-settings-toggle[aria-expanded="true"] {
+                opacity: 1;
+            }
+            .control-group {
+                flex: 1 1 auto;
+                min-width: 120px;
+            }
+            .actions-container {
+                width: 100%;
+                flex-basis: 100%;
+                order: -1;
+            }
+            .button {
+                padding: 0.75rem 0;
+            }
+            label {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <h1 class="sr-only">Interactive Sand Art Frame Simulator</h1>
+        <div id="simulation-container">
+            <canvas id="sand-canvas"></canvas>
+        </div>
+
+        <aside id="controls" aria-label="Simulation Controls">
+            <div class="actions-container">
+                <button id="flip-button" class="button">Flip</button>
+                <button id="shake-button" class="button">Shake</button>
+            </div>
+            <div class="control-group">
+                <label for="viscosity-slider">Slowness</label>
+                <input type="range" id="viscosity-slider" min="5" max="200" value="50">
+            </div>
+             <div class="control-group">
+                <label for="friction-slider">Friction</label>
+                <input type="range" id="friction-slider" min="20" max="90" value="60">
+            </div>
+            <div class="control-group">
+                <label for="paint-density-slider">Paint Amount</label>
+                <input type="range"id="paint-density-slider" min="1" max="10" value="3">
+            </div>
+            <div class="control-group">
+                <label for="paint-controls">Paint</label>
+                <div id="paint-controls"></div>
+            </div>
+        </aside>
+        
+        <button id="mobile-settings-toggle" class="button" aria-controls="controls" aria-expanded="false">
+             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-sliders"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
+        </button>
+    </main>
+
+    <!-- =================================================================
+    PRODUCTION JAVASCRIPT: DO NOT EDIT
+    ================================================================== -->
+    <script>
+        const canvas = document.getElementById('sand-canvas');
+        const ctx = canvas.getContext('2d');
+        const controls = document.getElementById('controls');
+        const paintControlsContainer = document.getElementById('paint-controls');
+
+        // --- Color Scheme Generation ---
+        let colorScheme;
+        let sandColors = [];
+
+        function generateMonochromaticScheme() {
+            const hue = Math.floor(Math.random() * 360);
+            const saturation = 70;
+            const uiSaturation = 50;
+
+            const borderLightness = 25;
+            const bgLightnessStart = 88;
+            const bgLightnessEnd = 78;
+            const borderSaturation = 20;
+
+            colorScheme = {
+                hue: hue,
+                bodyBg: `hsl(${hue}, 20%, 95%)`,
+                canvasBgStart: `hsl(${hue}, ${saturation}%, ${bgLightnessStart}%)`,
+                canvasBgEnd: `hsl(${hue}, ${saturation}%, ${bgLightnessEnd}%)`,
+                canvasBorder: `hsl(${hue}, ${borderSaturation}%, ${borderLightness}%)`,
+                uiText: `hsl(${hue}, 30%, 30%)`,
+                uiPrimary: `hsl(${hue}, ${uiSaturation}%, 55%)`,
+                uiPrimaryHover: `hsl(${hue}, ${uiSaturation}%, 60%)`,
+            };
+            
+            // Define sand colors with lightness values that avoid the background and border
+            sandColors = [
+                { color: `hsl(${hue}, ${saturation-10}%, 15%)`, density: 1.8, radius: 2.6 }, // Darkest, avoids border
+                { color: `hsl(${hue}, ${saturation-20}%, 35%)`, density: 1.6, radius: 2.7 }, // Dark, avoids border
+                { color: `hsl(${hue}, ${saturation}%, 50%)`, density: 1.3, radius: 2.8 },     // Mid-tone
+                { color: `hsl(${hue}, ${saturation}%, 65%)`, density: 1.0, radius: 2.9 },     // Lighter mid-tone
+                { color: `hsl(${hue}, ${saturation+10}%, 95%)`, density: 0.8, radius: 3.0 }, // Lightest, avoids background
+                { color: `hsl(${hue}, ${saturation-10}%, 42%)`, density: 0.7, radius: 3.1 }  // Extra mid-tone
+            ];
+            
+            document.documentElement.style.setProperty('--main-hue-color', colorScheme.uiPrimary);
+        }
+
+        function applyColorScheme() {
+            document.body.style.backgroundColor = colorScheme.bodyBg;
+            canvas.style.background = `linear-gradient(to top, ${colorScheme.canvasBgStart}, ${colorScheme.canvasBgEnd})`;
+            canvas.style.border = `12px solid ${colorScheme.canvasBorder}`;
+            
+            document.querySelectorAll('.button').forEach(btn => {
+                btn.style.backgroundColor = colorScheme.uiPrimary;
+                btn.addEventListener('mouseover', () => btn.style.backgroundColor = colorScheme.uiPrimaryHover);
+                btn.addEventListener('mouseout', () => btn.style.backgroundColor = colorScheme.uiPrimary);
+            });
+
+            document.querySelectorAll('label').forEach(el => el.style.color = colorScheme.uiText);
+            document.querySelectorAll('input[type="range"]').forEach(el => {
+                const style = document.createElement('style');
+                style.innerHTML = `
+                    input[type="range"]#${el.id}::-webkit-slider-thumb { background-color: ${colorScheme.uiPrimary}; }
+                    input[type="range"]#${el.id}::-moz-range-thumb { background-color: ${colorScheme.uiPrimary}; }
+                `;
+                document.head.appendChild(style);
+            });
+        }
+
+
+        // --- Simulation Parameters ---
+        let sandParticles = [];
+        let airBubbles = [];
+        let grid = [];
+        const NUM_PARTICLES = 6000;
+        const BUBBLE_RADIUS_MIN = 8;
+        const BUBBLE_RADIUS_MAX = 20;
+        let GRAVITY = 0.08; 
+        const airQuantity = 30;
+        let viscosityFactor = 0.995; // Default "slowness" factor
+        let friction = 0.6; 
+        let paintDensity = 3;
+        const REST_THRESHOLD_SQ = 0.1 * 0.1;
+
+        let cellSize, gridWidth, gridHeight;
+        let controlsTimeout;
+        let isFlipping = false;
+        let isPainting = false;
+        let currentBrush;
+
+        // --- Event Listeners & UI ---
+        const flipButton = document.getElementById('flip-button');
+        const shakeButton = document.getElementById('shake-button');
+        const viscositySlider = document.getElementById('viscosity-slider');
+        const frictionSlider = document.getElementById('friction-slider');
+        const paintDensitySlider = document.getElementById('paint-density-slider');
+
+        flipButton.addEventListener('click', () => {
+            if (isFlipping) return;
+            isFlipping = true;
+            canvas.style.transform = `rotate(180deg)`;
+            
+            setTimeout(() => {
+                for (const p of sandParticles) {
+                    p.x = canvas.width - p.x;
+                    p.y = canvas.height - p.y;
+                    p.vx = 0; p.vy = 0;
+                    p.isResting = false;
+                }
+                for (const b of airBubbles) {
+                    b.x = canvas.width - b.x;
+                    b.y = canvas.height - b.y;
+                    b.vy = -(Math.random() * 0.8 + 0.2);
+                    b.vx = (Math.random() * 0.1);
+                }
+                canvas.style.transition = 'none';
+                canvas.style.transform = 'rotate(0deg)';
+                canvas.offsetHeight;
+                canvas.style.transition = 'transform 0.7s cubic-bezier(0.68, -0.55, 0.27, 1.55)';
+                isFlipping = false;
+            }, 700);
+        });
+        
+        shakeButton.addEventListener('click', () => {
+            const shakeIntensity = 12;
+            for (const p of sandParticles) {
+                p.vx += (Math.random() - 0.5) * shakeIntensity;
+                p.vy += (Math.random() - 0.5) * shakeIntensity;
+                p.isResting = false;
+            }
+             for (const b of airBubbles) {
+                b.vx += (Math.random() - 0.5) * shakeIntensity;
+                // Give bubbles a strong upward shake
+                b.vy -= Math.random() * shakeIntensity;
+            }
+        });
+
+        // Viscosity slider now controls "slowness". Higher value = more slowdown.
+        viscositySlider.addEventListener('input', (e) => { 
+            // The damping factor is calculated from the slider value.
+            // A higher slider value results in a lower multiplier, hence more slowness.
+            viscosityFactor = 1 - (parseInt(e.target.value) / 10000); 
+        });
+
+        frictionSlider.addEventListener('input', (e) => { friction = e.target.value / 100; });
+        paintDensitySlider.addEventListener('input', (e) => { paintDensity = parseInt(e.target.value); });
+
+        // Initialize viscosity on load
+        viscosityFactor = 1 - (parseInt(viscositySlider.value) / 10000);
+
+        // --- Particle & Bubble Classes ---
+        class SandParticle {
+            constructor(x, y, color, density, radius) {
+                this.x = x; this.y = y;
+                this.radius = radius;
+                this.color = color;
+                this.density = density;
+                this.vy = 0; this.vx = 0;
+                this.isResting = false;
+            }
+            update() {
+                if (this.isResting) return;
+                
+                this.vx += (Math.random() - 0.5) * 0.03;
+
+                this.vx *= viscosityFactor;
+                this.vy *= viscosityFactor;
+                this.vy += GRAVITY * this.density;
+                this.x += this.vx;
+                this.y += this.vy;
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        class AirBubble {
+            constructor(x, y, radius) {
+                this.x = x; this.y = y; this.radius = radius;
+                this.vx = (Math.random() - 0.5) * 0.2;
+                this.vy = -(Math.random() * 0.8 + 0.5); 
+            }
+            update(sandGrid) {
+                let particlesAbove = 0;
+                const gridX = Math.floor(this.x / cellSize);
+                const gridY = Math.floor(this.y / cellSize);
+
+                for(let i = -3; i <= 3; i++){
+                    for(let j = -5; j <= 0; j++){
+                        const checkX = gridX + i;
+                        const checkY = gridY + j;
+                        if(checkX >= 0 && checkX < gridWidth && checkY >= 0 && checkY < gridHeight){
+                           const cell = sandGrid[checkY * gridWidth + checkX];
+                           if(cell && cell.length > 0) {
+                               particlesAbove += cell.reduce((sum, p) => sum + p.density, 0);
+                           }
+                        }
+                    }
+                }
+                
+                const hindranceFactor = 1 / (1 + particlesAbove * 0.5);
+                const effectiveVy = this.vy * hindranceFactor;
+
+                this.x += this.vx;
+                this.y += effectiveVy;
+
+                this.vx += (Math.random() - 0.5) * 0.05;
+                this.vx *= 0.98;
+
+                if (this.y - this.radius < 0) { this.y = this.radius; this.vy = 0; }
+                if (this.x - this.radius > canvas.width) { this.x = canvas.width - this.radius; }
+                if (this.x + this.radius < 0) { this.x = this.radius; }
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
+                ctx.lineWidth = 1.5; ctx.fill(); ctx.stroke();
+            }
+        }
+
+        // --- Simulation & Physics ---
+        function initializeSimulation() {
+            sandParticles = [];
+            airBubbles = [];
+            
+            let yPos = canvas.height;
+            for (const sandType of sandColors) {
+                const layerHeight = canvas.height * 0.07;
+                const numForThisLayer = Math.floor(NUM_PARTICLES * (1 / sandColors.length));
+                for (let i = 0; i < numForThisLayer; i++) {
+                    const x = Math.random() * canvas.width;
+                    const y = yPos - (Math.random() * layerHeight);
+                    sandParticles.push(new SandParticle(x, y, sandType.color, sandType.density, sandType.radius));
+                }
+                yPos -= layerHeight;
+            }
+            
+            for (let i = 0; i < airQuantity; i++) {
+                const x = Math.random() * canvas.width;
+                const y = canvas.height / 2 + (Math.random() - 0.5) * (canvas.height * 0.4);
+                const radius = Math.random() * (BUBBLE_RADIUS_MAX - BUBBLE_RADIUS_MIN) + BUBBLE_RADIUS_MIN;
+                airBubbles.push(new AirBubble(x, y, radius));
+            }
+        }
+
+        function handleCollisions() {
+            const maxRadius = 3.1;
+            cellSize = maxRadius * 2.5;
+            gridWidth = Math.ceil(canvas.width / cellSize);
+            gridHeight = Math.ceil(canvas.height / cellSize);
+            grid = Array.from({ length: gridWidth * gridHeight }, () => []);
+            
+            for (const p of sandParticles) {
+                const cellX = Math.floor(p.x / cellSize);
+                const cellY = Math.floor(p.y / cellSize);
+                if (cellX >= 0 && cellX < gridWidth && cellY >= 0 && cellY < gridHeight) {
+                    grid[cellY * gridWidth + cellX].push(p);
+                }
+            }
+
+            for (const p1 of sandParticles) {
+                if (p1.y + p1.radius > canvas.height) { p1.y = canvas.height - p1.radius; p1.vy = 0; }
+                if (p1.x - p1.radius < 0) { p1.x = p1.radius; p1.vx *= -0.5; }
+                if (p1.x + p1.radius > canvas.width) { p1.x = canvas.width - p1.radius; p1.vx *= -0.5; }
+                if (p1.y - p1.radius < 0) { p1.y = p1.radius; p1.vy *= -0.1; }
+
+                const cellX = Math.floor(p1.x / cellSize);
+                const cellY = Math.floor(p1.y / cellSize);
+                let isSupported = false;
+
+                for (let dx = -1; dx <= 1; dx++) {
+                    for (let dy = -1; dy <= 1; dy++) {
+                        const checkX = cellX + dx;
+                        const checkY = cellY + dy;
+                        if (checkX >= 0 && checkX < gridWidth && checkY >= 0 && checkY < gridHeight) {
+                            for (const p2 of grid[checkY * gridWidth + checkX]) {
+                                if (p1 !== p2) {
+                                    const wasResolved = resolveParticleCollision(p1, p2);
+                                    if(wasResolved && p1.y > p2.y) {
+                                        isSupported = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                 for (const bubble of airBubbles) {
+                    const wasDisturbed = resolveParticleBubbleCollision(p1, bubble);
+                    if (wasDisturbed) isSupported = false;
+                }
+
+                const velocitySq = p1.vx * p1.vx + p1.vy * p1.vy;
+                if(isSupported && velocitySq < REST_THRESHOLD_SQ) {
+                    p1.isResting = true;
+                } else if (p1.y >= canvas.height - p1.radius * 1.1 && velocitySq < REST_THRESHOLD_SQ * 5) {
+                    p1.isResting = true;
+                } else {
+                    p1.isResting = false;
+                }
+            }
+        }
+
+        function resolveParticleCollision(p1, p2) {
+            const dx = p2.x - p1.x;
+            const dy = p2.y - p1.y;
+            const distSq = dx * dx + dy * dy;
+            const minDist = p1.radius + p2.radius;
+            if (distSq < minDist * minDist && distSq > 0) {
+                const dist = Math.sqrt(distSq);
+                const overlap = (minDist - dist) * 0.5;
+                const nx = dx / dist;
+                const ny = dy / dist;
+                
+                p1.x -= overlap * nx; p1.y -= overlap * ny;
+                p2.x += overlap * nx; p2.y += overlap * ny;
+
+                const tangentVx = -ny; const tangentVy = nx;
+                const dotTangent1 = p1.vx * tangentVx + p1.vy * tangentVy;
+                const dotTangent2 = p2.vx * tangentVx + p2.vy * tangentVy;
+                const dotNormal1 = p1.vx * nx + p1.vy * ny;
+                const dotNormal2 = p2.vx * nx + p2.vy * ny;
+                const m1 = p1.density; const m2 = p2.density;
+
+                const momentum1 = (dotNormal1 * (m1 - m2) + 2 * m2 * dotNormal2) / (m1 + m2);
+                const momentum2 = (dotNormal2 * (m2 - m1) + 2 * m1 * dotNormal1) / (m1 + m2);
+
+                p1.vx = tangentVx * dotTangent1 * friction + nx * momentum1;
+                p1.vy = tangentVy * dotTangent1 * friction + ny * momentum1;
+                p2.vx = tangentVx * dotTangent2 * friction + nx * momentum2;
+                p2.vy = tangentVy * dotTangent2 * friction + ny * momentum2;
+
+                return true;
+            }
+            return false;
+        }
+
+        function resolveParticleBubbleCollision(particle, bubble) {
+            const dx = bubble.x - particle.x;
+            const dy = bubble.y - particle.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            const minDist = particle.radius + bubble.radius;
+            if (dist < minDist) {
+                const overlap = minDist - dist;
+                const nx = dist === 0 ? 1 : dx / dist;
+                const ny = dist === 0 ? 0 : dy / dist;
+                particle.x -= overlap * nx * 1.1; 
+                particle.y -= overlap * ny * 1.1;
+                particle.vy += bubble.vy * 0.25; 
+                particle.vx += bubble.vx * 0.1; 
+                return true;
+            }
+            return false;
+        }
+        
+        function setupPaintControls() {
+            paintControlsContainer.innerHTML = '';
+            sandColors.forEach(sand => {
+                const swatch = document.createElement('div');
+                swatch.className = 'color-swatch';
+                swatch.style.backgroundColor = sand.color;
+                swatch.addEventListener('click', () => {
+                    currentBrush = sand;
+                    document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
+                    swatch.classList.add('selected');
+                });
+                paintControlsContainer.appendChild(swatch);
+            });
+            if (paintControlsContainer.firstChild) {
+                 paintControlsContainer.firstChild.click();
+            }
+        }
+
+        function paintSand(e) {
+            e.preventDefault();
+            const rect = canvas.getBoundingClientRect();
+            const x = (e.clientX || e.touches[0].clientX) - rect.left;
+            const y = (e.clientY || e.touches[0].clientY) - rect.top;
+            
+            const paintRadius = 20;
+            
+            for (let i = 0; i < paintDensity; i++) {
+                 if (sandParticles.length >= NUM_PARTICLES * 1.5) continue;
+                 const angle = Math.random() * Math.PI * 2;
+                 const radius = Math.random() * paintRadius;
+                 const px = x + Math.cos(angle) * radius;
+                 const py = y + Math.sin(angle) * radius;
+                 sandParticles.push(new SandParticle(px, py, currentBrush.color, currentBrush.density, currentBrush.radius));
+            }
+        }
+
+        canvas.addEventListener('mousedown', (e) => { isPainting = true; paintSand(e); });
+        canvas.addEventListener('mousemove', (e) => { if (isPainting) paintSand(e); });
+        canvas.addEventListener('mouseup', () => { isPainting = false; });
+        canvas.addEventListener('mouseleave', () => { isPainting = false; });
+        canvas.addEventListener('touchstart', (e) => { isPainting = true; paintSand(e); }, { passive: false });
+        canvas.addEventListener('touchmove', (e) => { if(isPainting) paintSand(e); }, { passive: false });
+        canvas.addEventListener('touchend', () => { isPainting = false; });
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            handleCollisions();
+            for (const particle of sandParticles) { particle.update(); }
+            for (const bubble of airBubbles) { bubble.update(grid); }
+            
+            for (const particle of sandParticles) { particle.draw(); }
+            for (const bubble of airBubbles) { bubble.draw(); }
+
+            requestAnimationFrame(animate);
+        }
+
+        function resizeAndInitialize() {
+            if (window.matchMedia("(max-width: 767px)").matches) {
+                // Mobile: Full-screen vertical layout
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+
+            } else {
+                // Desktop: Horizontal/Square layout with side controls
+                const controlsWidth = controls.offsetWidth > 0 ? controls.offsetWidth + 60 : 280;
+                const availableWidth = window.innerWidth - controlsWidth;
+                const availableHeight = window.innerHeight * 0.9;
+                
+                const size = Math.min(availableWidth, availableHeight);
+                
+                canvas.width = size;
+                canvas.height = size;
+            }
+
+            initializeSimulation();
+        }
+
+        function manageControlsVisibility() {
+            // On mobile, the controls are toggleable and visibility is handled by the toggle script.
+            if (window.matchMedia("(max-width: 767px)").matches) {
+                return;
+            }
+            clearTimeout(controlsTimeout);
+            controls.style.opacity = '1';
+            controlsTimeout = setTimeout(() => { controls.style.opacity = '0'; }, 4000);
+        }
+
+        // --- Initial Setup ---
+        function main() {
+            generateMonochromaticScheme();
+            applyColorScheme();
+            setupPaintControls();
+
+            resizeAndInitialize();
+
+            window.addEventListener('resize', () => {
+                clearTimeout(window.resizedFinished);
+                window.resizedFinished = setTimeout(resizeAndInitialize, 250);
+            });
+            document.addEventListener('mousemove', manageControlsVisibility);
+            document.addEventListener('touchstart', manageControlsVisibility, { passive: true }); // Use passive listener for touchstart
+
+            animate();
+            manageControlsVisibility();
+        }
+
+        main();
+    </script>
+    
+    <!-- =================================================================
+    NEW UI SCRIPT: Handles mobile settings toggle
+    ================================================================== -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const mobileToggle = document.getElementById('mobile-settings-toggle');
+            const controlsPanel = document.getElementById('controls');
+
+            if (mobileToggle && controlsPanel) {
+                mobileToggle.addEventListener('click', () => {
+                    const isOpen = controlsPanel.classList.toggle('is-open');
+                    mobileToggle.setAttribute('aria-expanded', isOpen);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
